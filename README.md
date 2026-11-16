@@ -86,10 +86,10 @@ Jadwali/
 │   │   ├── pages/                  # LandingPage, Dashboard, Teachers, Classes, Generator, etc.
 │   │   └── theme/                  # Brand tokens, colors, and dark mode styling
 │   └── tests/                      # Vitest + React Testing Library test suite
-├── server/                         # Optional Node.js + Express REST API
-│   ├── controllers/                # Route controllers
-│   ├── models/                     # Mongoose models (Teacher, Class, Subject)
-│   └── populate.js                 # Sample database seeder
+├── server/                         # Optional Node.js + Express + TypeScript REST API
+│   ├── src/                        # Express application, routes, controllers, schemas, services
+│   ├── tests/                      # Integration and unit test suite (Vitest + Supertest)
+│   └── dist/                       # Compiled production JavaScript bundle
 └── .github/workflows/deploy.yml    # GitHub Actions deployment to GitHub Pages
 ```
 
