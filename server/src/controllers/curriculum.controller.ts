@@ -39,7 +39,7 @@ export async function updateCurriculumItem(req: Request, res: Response, next: Ne
     const item = await CurriculumModel.findOneAndUpdate(
       { id: req.params.id },
       { $set: updates },
-      { new: true }
+      { new: true, runValidators: true }
     );
     if (!item) {
       res.status(StatusCodes.NOT_FOUND).json({ message: 'Curriculum requirement not found' });

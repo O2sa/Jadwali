@@ -133,7 +133,7 @@ export async function generateScheduleServer(
     subjectId: l.subjectId || '',
     dayIndex: l.day,
     periodIndex: l.period,
-    roomNumber: classRoomMap.get(l.classId) || ''
+    roomNumber: classRoomMap.get(l.classId) || 'Unassigned'
   }));
 
   await ScheduleModel.updateMany({ isActive: true }, { $set: { isActive: false } });
