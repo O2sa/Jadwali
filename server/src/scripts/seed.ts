@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 import { connectDatabase, disconnectDatabase } from '../config/database.js';
 import { importSchoolBackup } from '../services/backup.service.js';
 
@@ -54,10 +56,10 @@ export async function seed(): Promise<void> {
 
 // Execute when run directly as CLI
 const isDirectRun =
-  process.argv[1] &&
-  (process.argv[1].endsWith('seed.ts') ||
-   process.argv[1].endsWith('seed.js') ||
-   process.argv[1].includes('seed'));
+  Boolean(process.argv[1]) &&
+  (fileURLToPath(import.meta.url) === path.resolve(process.argv[1]) ||
+   process.argv[1].endsWith('seed.ts') ||
+   process.argv[1].endsWith('seed.js'));
 
 if (isDirectRun) {
   seed().catch((err) => {

@@ -186,4 +186,46 @@ describe('Backup API (/api/v1/backup)', () => {
       });
     expect(res.status).toBe(400);
   });
+
+  it('rejects invalid entity documents in backup payload with 400 Bad Request', async () => {
+    // 1. Invalid teacher document (missing name/specialization)
+    const invalidTeacherRes = await request(app)
+      .post('/api/v1/backup/import')
+      .send({
+        teachers: [{ id: 't_bad' }] // missing name & specialization
+      });
+    expect(invalidTeacherRes.status).toBe(400);
+
+    // 2. Invalid class document (gradeLevel out of range)
+    const invalidClassRes = await request(app)
+      .post('/api/v1/backup/import')
+      .send({
+        classes: [{ id: 'c_bad', gradeLevel: 99, roomNumber: '101', sectionName: 'A' }]
+      });
+    expect(invalidClassRes.status).toBe(400);
+
+    // 3. Invalid subject document (missing code)
+    const invalidSubjectRes = await request(app)
+      .post('/api/v1/backup/import')
+      .send({
+        subjects: [{ id: 's_bad', name: 'Art' }] // missing code
+      });
+    expect(invalidSubjectRes.status).toBe(400);
+
+    // 4. Invalid curriculum document (periodsPerWeek < 1)
+    const invalidCurrRes = await request(app)
+      .post('/api/v1/backup/import')
+      .send({
+        curriculum: [{ classId: 'c1', subjectId: 's1', teacherId: 't1', periodsPerWeek: 0 }]
+      });
+    expect(invalidCurrRes.status).toBe(400);
+
+    // 5. Invalid schedule document (invalid status enum)
+    const invalidSchedRes = await request(app)
+      .post('/api/v1/backup/import')
+      .send({
+        schedules: [{ name: 'Bad Sched', status: 'unknown_status' }]
+      });
+    expect(invalidSchedRes.status).toBe(400);
+  });
 });
