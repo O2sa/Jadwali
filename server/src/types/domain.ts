@@ -65,6 +65,14 @@ export interface SavedScheduleRecord {
   assignments: TimetableAssignment[];
 }
 
+export interface SolverProgress {
+  step: number;
+  assignedCount: number;
+  totalLectures: number;
+  backtracks: number;
+  elapsedMs: number;
+}
+
 export interface SchoolBackupPayload {
   version: number;
   exportedAt: string;

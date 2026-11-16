@@ -6,6 +6,12 @@ export interface SubjectDocument extends Document, Omit<SubjectRecord, 'id'> {
   id: string;
 }
 
+const transform = (_doc: unknown, ret: Record<string, any>) => {
+  delete ret._id;
+  delete ret.__v;
+  return ret;
+};
+
 const SubjectSchema = new Schema<SubjectDocument>(
   {
     id: { type: String, required: true, unique: true, default: () => `subj_${nanoid(8)}` },
@@ -20,13 +26,8 @@ const SubjectSchema = new Schema<SubjectDocument>(
   },
   {
     timestamps: true,
-    toJSON: {
-      transform(_doc: unknown, ret: Record<string, any>) {
-        delete ret._id;
-        delete ret.__v;
-        return ret;
-      }
-    }
+    toJSON: { transform },
+    toObject: { transform }
   }
 );
 

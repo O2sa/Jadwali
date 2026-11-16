@@ -5,6 +5,15 @@ export interface SchoolConfigDocument extends Document, Omit<SchoolConfigRecord,
   gradePeriodsConfig: Map<string, number>;
 }
 
+const transform = (_doc: unknown, ret: Record<string, any>) => {
+  delete ret._id;
+  delete ret.__v;
+  if (ret.gradePeriodsConfig instanceof Map) {
+    ret.gradePeriodsConfig = Object.fromEntries(ret.gradePeriodsConfig);
+  }
+  return ret;
+};
+
 const SchoolConfigSchema = new Schema<SchoolConfigDocument>(
   {
     schoolName: { type: String, required: true, default: 'Jadwali School' },
@@ -23,16 +32,8 @@ const SchoolConfigSchema = new Schema<SchoolConfigDocument>(
   },
   {
     timestamps: true,
-    toJSON: {
-      transform(_doc: unknown, ret: Record<string, any>) {
-        delete ret._id;
-        delete ret.__v;
-        if (ret.gradePeriodsConfig instanceof Map) {
-          ret.gradePeriodsConfig = Object.fromEntries(ret.gradePeriodsConfig);
-        }
-        return ret;
-      }
-    }
+    toJSON: { transform },
+    toObject: { transform }
   }
 );
 

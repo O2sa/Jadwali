@@ -5,6 +5,7 @@ import { ClassModel } from '../src/models/Class.model.js';
 import { SubjectModel } from '../src/models/Subject.model.js';
 import { CurriculumModel } from '../src/models/Curriculum.model.js';
 import { ScheduleModel } from '../src/models/Schedule.model.js';
+import type { SolverProgress } from '../src/types/domain.js';
 
 describe('Mongoose Domain Models', () => {
   it('creates and serializes a Teacher with string id and no __v', async () => {
@@ -22,6 +23,11 @@ describe('Mongoose Domain Models', () => {
     expect(json._id).toBeUndefined();
     expect(json.__v).toBeUndefined();
     expect(json.name).toBe('Ahmed Mansoor');
+
+    const obj = teacher.toObject();
+    expect(obj.id).toBe('teach_1');
+    expect(obj._id).toBeUndefined();
+    expect(obj.__v).toBeUndefined();
   });
 
   it('creates and serializes a Class record', async () => {
@@ -37,9 +43,14 @@ describe('Mongoose Domain Models', () => {
     expect(json.gradeLevel).toBe(1);
     expect(json._id).toBeUndefined();
     expect(json.__v).toBeUndefined();
+
+    const obj = cls.toObject();
+    expect(obj.id).toBe('cls_1');
+    expect(obj._id).toBeUndefined();
+    expect(obj.__v).toBeUndefined();
   });
 
-  it('creates and serializes all remaining models cleanly', async () => {
+  it('creates and serializes all remaining models cleanly with toJSON and toObject', async () => {
     const config = await SchoolConfigModel.create({});
     const configJson = config.toJSON();
     expect(configJson.schoolName).toBe('Jadwali School');
@@ -47,6 +58,12 @@ describe('Mongoose Domain Models', () => {
     expect(configJson.__v).toBeUndefined();
     expect(typeof configJson.gradePeriodsConfig).toBe('object');
     expect(configJson.gradePeriodsConfig[1] ?? configJson.gradePeriodsConfig['1']).toBe(6);
+
+    const configObj = config.toObject();
+    expect(configObj._id).toBeUndefined();
+    expect(configObj.__v).toBeUndefined();
+    expect(typeof configObj.gradePeriodsConfig).toBe('object');
+    expect(configObj.gradePeriodsConfig[1] ?? configObj.gradePeriodsConfig['1']).toBe(6);
 
     const subject = await SubjectModel.create({
       id: 'subj_1',
@@ -59,6 +76,10 @@ describe('Mongoose Domain Models', () => {
     expect(subjJson._id).toBeUndefined();
     expect(subjJson.__v).toBeUndefined();
 
+    const subjObj = subject.toObject();
+    expect(subjObj._id).toBeUndefined();
+    expect(subjObj.__v).toBeUndefined();
+
     const curriculum = await CurriculumModel.create({
       id: 'curr_1',
       classId: 'cls_1',
@@ -70,6 +91,10 @@ describe('Mongoose Domain Models', () => {
     expect(currJson.periodsPerWeek).toBe(5);
     expect(currJson._id).toBeUndefined();
     expect(currJson.__v).toBeUndefined();
+
+    const currObj = curriculum.toObject();
+    expect(currObj._id).toBeUndefined();
+    expect(currObj.__v).toBeUndefined();
 
     const schedule = await ScheduleModel.create({
       id: 'sched_1',
@@ -93,6 +118,13 @@ describe('Mongoose Domain Models', () => {
     expect(schedJson.assignments[0]._id).toBeUndefined();
     expect(schedJson._id).toBeUndefined();
     expect(schedJson.__v).toBeUndefined();
+    expect(typeof schedJson.createdAt).toBe('string');
+
+    const schedObj = schedule.toObject();
+    expect(schedObj.status).toBe('solved');
+    expect(schedObj._id).toBeUndefined();
+    expect(schedObj.__v).toBeUndefined();
+    expect(typeof schedObj.createdAt).toBe('string');
   });
 
   it('generates nanoid-based string IDs if id is omitted', async () => {
@@ -127,6 +159,7 @@ describe('Mongoose Domain Models', () => {
       name: 'Auto ID Schedule'
     });
     expect(schedule.id).toMatch(/^sched_/);
+    expect(typeof schedule.createdAt).toBe('string');
   });
 
   it('queries models by string id and preserves JSON transform', async () => {
@@ -143,5 +176,16 @@ describe('Mongoose Domain Models', () => {
     expect(json.name).toBe('Query Test');
     expect(json._id).toBeUndefined();
     expect(json.__v).toBeUndefined();
+  });
+
+  it('verifies SolverProgress interface compiles and types correctly', () => {
+    const progress: SolverProgress = {
+      step: 10,
+      assignedCount: 5,
+      totalLectures: 20,
+      backtracks: 1,
+      elapsedMs: 250
+    };
+    expect(progress.step).toBe(10);
   });
 });

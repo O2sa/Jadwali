@@ -6,6 +6,12 @@ export interface ScheduleDocument extends Document, Omit<SavedScheduleRecord, 'i
   id: string;
 }
 
+const transform = (_doc: unknown, ret: Record<string, any>) => {
+  delete ret._id;
+  delete ret.__v;
+  return ret;
+};
+
 const ScheduleSchema = new Schema<ScheduleDocument>(
   {
     id: { type: String, required: true, unique: true, default: () => `sched_${nanoid(8)}` },
@@ -34,14 +40,9 @@ const ScheduleSchema = new Schema<ScheduleDocument>(
     ]
   },
   {
-    timestamps: true,
-    toJSON: {
-      transform(_doc: unknown, ret: Record<string, any>) {
-        delete ret._id;
-        delete ret.__v;
-        return ret;
-      }
-    }
+    timestamps: { createdAt: false, updatedAt: true },
+    toJSON: { transform },
+    toObject: { transform }
   }
 );
 

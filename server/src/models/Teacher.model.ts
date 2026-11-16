@@ -6,6 +6,12 @@ export interface TeacherDocument extends Document, Omit<TeacherRecord, 'id'> {
   id: string;
 }
 
+const transform = (_doc: unknown, ret: Record<string, any>) => {
+  delete ret._id;
+  delete ret.__v;
+  return ret;
+};
+
 const TeacherSchema = new Schema<TeacherDocument>(
   {
     id: { type: String, required: true, unique: true, default: () => `teach_${nanoid(8)}` },
@@ -23,13 +29,8 @@ const TeacherSchema = new Schema<TeacherDocument>(
   },
   {
     timestamps: true,
-    toJSON: {
-      transform(_doc: unknown, ret: Record<string, any>) {
-        delete ret._id;
-        delete ret.__v;
-        return ret;
-      }
-    }
+    toJSON: { transform },
+    toObject: { transform }
   }
 );
 

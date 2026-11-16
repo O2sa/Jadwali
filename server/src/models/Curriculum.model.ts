@@ -6,6 +6,12 @@ export interface CurriculumDocument extends Document, Omit<CurriculumRequirement
   id: string;
 }
 
+const transform = (_doc: unknown, ret: Record<string, any>) => {
+  delete ret._id;
+  delete ret.__v;
+  return ret;
+};
+
 const CurriculumSchema = new Schema<CurriculumDocument>(
   {
     id: { type: String, required: true, unique: true, default: () => `curr_${nanoid(8)}` },
@@ -16,13 +22,8 @@ const CurriculumSchema = new Schema<CurriculumDocument>(
   },
   {
     timestamps: true,
-    toJSON: {
-      transform(_doc: unknown, ret: Record<string, any>) {
-        delete ret._id;
-        delete ret.__v;
-        return ret;
-      }
-    }
+    toJSON: { transform },
+    toObject: { transform }
   }
 );
 
