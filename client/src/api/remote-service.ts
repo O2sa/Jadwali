@@ -14,11 +14,15 @@ import type {
 import { DEFAULT_SCHOOL_CONFIG, generateDemoData, type DemoDataOptions } from './demo-data';
 import { runSolver, cancelActiveSolver } from './worker/worker-client';
 
+const DEFAULT_BASE_URL = (import.meta.env?.VITE_API_URL as string | undefined)
+  ? `${(import.meta.env.VITE_API_URL as string).replace(/\/$/, '')}/api/v1`
+  : '/api/v1';
+
 export class RemoteDataService implements IDataService {
   readonly mode = 'server' as const;
   private http: AxiosInstance;
 
-  constructor(baseURL = '/api/v1') {
+  constructor(baseURL = DEFAULT_BASE_URL) {
     this.http = axios.create({
       baseURL,
       headers: {

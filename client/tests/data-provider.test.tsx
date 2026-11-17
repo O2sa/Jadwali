@@ -1,10 +1,10 @@
 import React from 'react';
 import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import 'fake-indexeddb/auto';
 import { DataProvider, useData, useStorageMode, useDataService } from '../src/api/data-context';
-import { useActiveSchedule, useScheduleActions } from '../src/api/queries/useSchoolData';
+import { useActiveSchedule, useScheduleActions, useTeachers, useTeacherMutations } from '../src/api/queries/useSchoolData';
 import type { SavedScheduleRecord } from '../src/api/types';
 import { db } from '../src/api/db';
 
@@ -96,5 +96,55 @@ describe('DataProvider and Mode Switching', () => {
     // The query cache must immediately return the updated assignments without reload!
     expect(result.current.active.data?.assignments[0].dayIndex).toBe(2);
     expect(result.current.active.data?.assignments[0].periodIndex).toBe(3);
+  });
+
+  it('isolates data and switches seamlessly between client and server modes with distinct query caches', async () => {
+    const { result } = renderHook(
+      () => {
+        const [mode, setMode] = useStorageMode();
+        const teachers = useTeachers();
+        const teacherMutations = useTeacherMutations();
+        return { mode, setMode, teachers, teacherMutations };
+      },
+      { wrapper }
+    );
+
+    // In client mode, save a teacher in Dexie
+    await act(async () => {
+      await result.current.teacherMutations.saveTeacher({
+        name: 'Local Teacher',
+        specialization: 'Physics',
+        maxDailyPeriods: 4,
+        maxWeeklyPeriods: 18,
+        unavailableSlots: [],
+      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.teachers.data?.some((t) => t.name === 'Local Teacher')).toBe(true);
+    });
+
+    // Switch to server mode
+    act(() => {
+      result.current.setMode('server');
+    });
+
+    expect(result.current.mode).toBe('server');
+
+    // In server mode, Dexie local teacher is NOT in the server query cache
+    await waitFor(() => {
+      expect(result.current.teachers.isSuccess).toBe(true);
+    });
+    expect(result.current.teachers.data?.some((t) => t.name === 'Local Teacher') ?? false).toBe(false);
+
+    // Switch back to client mode
+    act(() => {
+      result.current.setMode('client');
+    });
+
+    expect(result.current.mode).toBe('client');
+    await waitFor(() => {
+      expect(result.current.teachers.data?.some((t) => t.name === 'Local Teacher')).toBe(true);
+    });
   });
 });
