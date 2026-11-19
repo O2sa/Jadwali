@@ -3,15 +3,30 @@
   "version": "1.0.0",
   "private": true,
   "description": "Full-stack School Schedule Generator Monorepo (Engine, Client, Server)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/O2sa/Jadwali.git"
+  },
   "scripts": {
     "dev": "pnpm --filter client dev",
     "dev:server": "pnpm --filter server dev",
     "dev:all": "concurrently -k -p \"[{name}]\" -n \"ENGINE,SERVER,CLIENT\" -c \"yellow,blue,green\" \"pnpm --filter school-timetabling-engine watch\" \"pnpm --filter server dev\" \"pnpm --filter client dev\"",
     "build": "pnpm --filter school-timetabling-engine build && pnpm --filter client build",
     "test": "pnpm -r run test",
-    "typecheck": "pnpm --filter school-timetabling-engine build && pnpm -r run typecheck"
+    "typecheck": "pnpm --filter school-timetabling-engine build && pnpm -r run typecheck",
+    "release:engine": "semantic-release --config release-engine.config.cjs",
+    "release:platform": "semantic-release --config release-platform.config.cjs"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^10.3.5",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.0",
+    "concurrently": "^8.2.2",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "semantic-release": "^24.2.9"
   }
 }
