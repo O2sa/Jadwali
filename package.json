@@ -1,6 +1,6 @@
 {
   "name": "school-schedule-generator-monorepo",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Full-stack School Schedule Generator Monorepo (Engine, Client, Server)",
   "repository": {
