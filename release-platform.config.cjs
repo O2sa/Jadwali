@@ -49,7 +49,8 @@ module.exports = {
     [
       '@semantic-release/exec',
       {
-        prepareCmd: 'node scripts/sync-platform-versions.js ${nextRelease.version}'
+        prepareCmd: 'node scripts/sync-platform-versions.js ${nextRelease.version}',
+        successCmd: 'node -e "require(\'fs\').writeFileSync(\'.platform-version\', \'${nextRelease.version}\')"'
       }
     ],
     [

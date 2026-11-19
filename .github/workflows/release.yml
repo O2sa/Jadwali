@@ -10,6 +10,7 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
+  packages: write
 
 concurrency:
   group: release-${{ github.ref }}
@@ -55,10 +56,14 @@ jobs:
     name: Release Jadwali Platform
     needs: [release-engine]
     runs-on: ubuntu-latest
+    outputs:
+      released: ${{ steps.check_release.outputs.released }}
+      version: ${{ steps.check_release.outputs.version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -85,3 +90,108 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm release:platform
+
+      - name: Check if new platform version was released
+        id: check_release
+        run: |
+          if [ -f .platform-version ]; then
+            VERSION=$(cat .platform-version)
+            echo "released=true" >> "$GITHUB_OUTPUT"
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+            echo "Platform released version: $VERSION"
+          else
+            echo "released=false" >> "$GITHUB_OUTPUT"
+            echo "No new platform release created."
+          fi
+
+  publish-docker:
+    name: Build & Publish Docker Images
+    needs: [release-platform]
+    if: needs.release-platform.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lowercase repository owner
+        id: repo_owner
+        run: echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Extract metadata for Server
+        uses: docker/metadata-action@v5
+        id: meta_server
+        with:
+          images: ghcr.io/${{ steps.repo_owner.outputs.owner }}/jadwali-server
+          tags: |
+            type=raw,value=${{ needs.release-platform.outputs.version }}
+            type=raw,value=latest
+
+      - name: Build and push Server Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: server/Dockerfile
+          push: true
+          tags: ${{ steps.meta_server.outputs.tags }}
+          labels: ${{ steps.meta_server.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Extract metadata for Client
+        uses: docker/metadata-action@v5
+        id: meta_client
+        with:
+          images: ghcr.io/${{ steps.repo_owner.outputs.owner }}/jadwali-client
+          tags: |
+            type=raw,value=${{ needs.release-platform.outputs.version }}
+            type=raw,value=latest
+
+      - name: Build and push Client Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: client/Dockerfile
+          push: true
+          tags: ${{ steps.meta_client.outputs.tags }}
+          labels: ${{ steps.meta_client.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  sync-development:
+    name: Sync Release to Development Branch
+    needs: [release-platform]
+    if: always() && needs.release-platform.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge main back into development
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout development
+          git pull origin development
+          git merge origin/main --no-edit -m "chore: sync release from main back to development [skip ci]" || echo "No changes or already up to date"
+          git push origin development || echo "Nothing to push"
