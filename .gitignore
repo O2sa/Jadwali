@@ -6,6 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+walkthrough_verification_report.md
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -132,3 +133,5 @@ dist
 local/
 .agents/
 docs/
+.superpowers/
+**/superpowers/

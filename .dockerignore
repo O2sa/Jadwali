@@ -1,0 +1,33 @@
+# Dependencies & build outputs
+**/node_modules
+**/dist
+**/.pnpm-store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Git and tooling
+.git
+.gitignore
+.gitattributes
+.github
+.gemini
+.superpowers
+.vscode
+.idea
+.agents
+
+# Test & coverage artifacts
+coverage
+__snapshots__
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Documentation & reports
+docs
+*.md

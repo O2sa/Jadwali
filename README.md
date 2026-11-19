@@ -97,7 +97,39 @@ Jadwali/
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### 🐳 Docker Quickstart (Easiest Way to Run)
+
+The simplest and fastest way to run the entire full-stack platform (Frontend Client + Express API + MongoDB) is with Docker Compose:
+
+```bash
+# Clone the repository
+git clone https://github.com/O2sa/Jadwali.git
+cd Jadwali
+
+# Start all services in the background
+docker compose up -d
+```
+
+Once running, navigate to:
+- 🌐 **Web Application:** [http://localhost:3000](http://localhost:3000)
+- 🏥 **Health Check:** [http://localhost:3000/health](http://localhost:3000/health)
+- 📡 **REST API Root:** [http://localhost:3000/api/v1/school/config](http://localhost:3000/api/v1/school/config)
+
+> **💡 Instant Out-of-the-Box Demo:** On the first launch, Jadwali detects a fresh database and automatically seeds a complete demo school (teachers, classes, subjects, and curriculum) so you can start scheduling right away! Data is safely persisted across restarts in the `mongo_data` volume.
+
+To view real-time container logs:
+```bash
+docker compose logs -f
+```
+
+To stop the platform:
+```bash
+docker compose down
+```
+
+---
+
+### Prerequisites for Local Development
 
 - [Node.js](https://nodejs.org/) (version 18 or later, Node 20 LTS recommended)
 - [pnpm](https://pnpm.io/) (version 9 or later)

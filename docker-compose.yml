@@ -1,0 +1,42 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: jadwali-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: jadwali-server
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=6666
+      - MONGO_URL=mongodb://mongo:27017/school-scheduler
+      - AUTO_SEED=true
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    container_name: jadwali-client
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:80"
+    depends_on:
+      - server
+
+volumes:
+  mongo_data:

@@ -6,7 +6,7 @@ import path from 'path';
 export default defineConfig(({ command, mode }) => {
   const isProd = mode === 'production' || command === 'build';
   const repoName = process.env.GITHUB_REPOSITORY ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/` : '/Jadwali/';
-  const basePath = process.env.VITE_BASE_PATH || (isProd ? repoName : '/');
+  const basePath = process.env.VITE_BASE_PATH || (process.env.GITHUB_ACTIONS ? repoName : '/');
 
   return {
     base: basePath,
