@@ -1,3 +1,13 @@
+## [0.2.0](https://github.com/O2sa/Jadwali/compare/v0.1.0...v0.2.0) (2026-11-19)
+
+### ci
+
+* add continuous integration workflow for development branch and pull requests ([](https://github.com/O2sa/Jadwali/commit/fd953900612afd1c6792e5180bb972d0bfd61f67))
+
+### feat
+
+* **ci:** automate docker publishing to ghcr on main release and restrict pages deployment ([](https://github.com/O2sa/Jadwali/commit/00e0478fd7aec5d9a89b27c79db12b26af90fa2e))
+
 ## [0.1.0](https://github.com/O2sa/Jadwali/compare/v0.0.0...v0.1.0) (2026-11-19)
 
 ### fix
