@@ -1,3 +1,9 @@
+## [0.2.1](https://github.com/O2sa/Jadwali/compare/v0.2.0...v0.2.1) (2026-11-19)
+
+### fix
+
+* **ci:** remove automated back-sync to keep git history clean and prevent duplicates ([](https://github.com/O2sa/Jadwali/commit/aca3e91292fe33d6598232a44a4d46bbcf4d9d13))
+
 ## [0.2.0](https://github.com/O2sa/Jadwali/compare/v0.1.0...v0.2.0) (2026-11-19)
 
 ### ci
