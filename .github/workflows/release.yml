@@ -173,25 +173,3 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  sync-development:
-    name: Sync Release to Development Branch
-    needs: [release-platform]
-    if: always() && needs.release-platform.result == 'success'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Merge main back into development
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout development
-          git pull origin development
-          git merge origin/main --no-edit -m "chore: sync release from main back to development [skip ci]" || echo "No changes or already up to date"
-          git push origin development || echo "Nothing to push"
