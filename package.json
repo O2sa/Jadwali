@@ -14,8 +14,8 @@
     "build": "pnpm --filter school-timetabling-engine build && pnpm --filter client build",
     "test": "pnpm -r run test",
     "typecheck": "pnpm --filter school-timetabling-engine build && pnpm -r run typecheck",
-    "release:engine": "semantic-release --config release-engine.config.cjs",
-    "release:platform": "semantic-release --config release-platform.config.cjs"
+    "release:engine": "semantic-release --extends ./release-engine.config.cjs",
+    "release:platform": "semantic-release --extends ./release-platform.config.cjs"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
